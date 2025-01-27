@@ -37,7 +37,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <Sidebar />
-              <div className="hidden md:inline fixed top-3 right-3">
+              <div className="hidden md:inline fixed top-3 right-3 z-50">
                 <ThemeToggle />
               </div>
               <Suspense
