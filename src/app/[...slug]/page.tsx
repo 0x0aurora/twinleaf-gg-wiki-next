@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
@@ -26,6 +26,7 @@ export default function Home({
   const { slug } = React.use(params);
   let [setId, _cardId] = slug;
   const [cardId, setCardId] = React.useState(_cardId);
+  const queryClient = useQueryClient();
 
   // const scrollRef = React.useRef<HTMLElement>(null);
 
@@ -65,27 +66,22 @@ export default function Home({
     queryKey: [`https://api.pokemontcg.io/v2/cards/${cardId}`],
     enabled: cardId != null,
     queryFn: async () => {
-      const foundCard = allCards?.find((e) => e.id === cardId);
-      if (foundCard != null) {
-        return { data: foundCard };
-      } else {
-        const response = await fetch(
-          `https://api.pokemontcg.io/v2/cards/${cardId}`,
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return (await response.json()) as {
-          data: {
-            id: string;
-            name: string;
-            images: {
-              small: string;
-              large: string;
-            };
+      const response = await fetch(
+        `https://api.pokemontcg.io/v2/cards/${cardId}`,
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return (await response.json()) as {
+        data: {
+          id: string;
+          name: string;
+          images: {
+            small: string;
+            large: string;
           };
         };
-      }
+      };
     },
   });
 
@@ -101,6 +97,8 @@ export default function Home({
               evt.preventDefault();
               // shallow route
               window.history.pushState(null, "", evt.currentTarget.href);
+              // preload
+              queryClient.setQueryData([`https://api.pokemontcg.io/v2/cards/${e.id}`], { data: e });
               setCardId(e.id);
             }}
             href={`/${setId}/${e.id}`}
