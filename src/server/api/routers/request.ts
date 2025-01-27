@@ -49,7 +49,7 @@ export const requestRouter = createTRPCRouter({
         embeds: [
           {
             title: card.name,
-            description: `Set: ${set.name}\nNo. of Requests: ${cardRequests}`,
+            description: `Set: ${set.name}\nTotal Requests: ${cardRequests}`,
             image: {
               url: card.images.large,
             },
