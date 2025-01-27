@@ -107,7 +107,7 @@ export default function Sidebar() {
         </div>
         <div
           className={cn(
-            "py-3 px-6 w-full shadow-md justify-center hidden md:flex",
+            "py-3 px-6 w-full shadow-md border-b justify-center hidden md:flex",
           )}
         >
           <Link href="/">
@@ -120,8 +120,9 @@ export default function Sidebar() {
             />
           </Link>
         </div>
-        <ScrollArea className="p-3 flex-1">
+        <ScrollArea className="flex-1">
           <SetsMenu
+            className="p-3"
             sets={[...sets].reverse()}
             collapseTextForDesktop={!expanded}
           />
