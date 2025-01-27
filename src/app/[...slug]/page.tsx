@@ -270,6 +270,9 @@ export default function Home({
                 className={cn(
                   requestedCardIds.has(cardQuery.data.data.id) &&
                     "animate-thumbs-up",
+                  implementedCards.implementedCardIds.includes(
+                    cardQuery.data.data.id,
+                  ) && "hidden",
                 )}
                 disabled={requestedCardIds.has(cardQuery.data.data.id)}
               >
