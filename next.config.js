@@ -6,16 +6,16 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
-    images: {
-        remotePatterns: [
-            {
-                hostname: "images.pokemontcg.io"
-            }
-        ]
-    },
-    experimental: {
-        scrollRestoration: true,
-    }
+  images: {
+    remotePatterns: [
+      {
+        hostname: "images.pokemontcg.io",
+      },
+    ],
+  },
+  experimental: {
+    scrollRestoration: true,
+  },
 };
 
 export default config;

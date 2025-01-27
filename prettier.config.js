@@ -1,4 +1,13 @@
 /** @type {import('prettier').Config & import('prettier-plugin-tailwindcss').PluginOptions} */
-export default {
-  plugins: ["prettier-plugin-tailwindcss"],
+const config = {
+  plugins: ["prettier-plugin-tailwindcss", "prettier-plugin-classnames"],
+  semi: true,
+  trailingComma: "all",
+  singleQuote: false,
+  printWidth: 80,
+  tabWidth: 2,
+  customFunctions: ["cn"],
+  endingPosition: "absolute-with-indent",
 };
+
+export default config;
