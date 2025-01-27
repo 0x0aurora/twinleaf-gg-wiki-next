@@ -14,10 +14,7 @@ const config = {
     ],
     unoptimized: true,
   },
-  serverExternalPackages: [
-    "@prisma/adapter-libsql",
-    "@libsql/client",
-  ],
+  serverExternalPackages: ["@prisma/adapter-libsql", "@libsql/client"],
   experimental: {
     scrollRestoration: true,
   },

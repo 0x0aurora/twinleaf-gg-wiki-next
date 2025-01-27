@@ -4,7 +4,12 @@ import { env } from "~/env";
 
 let adapter: DriverAdapter | null = null;
 
-if (env.TURSO_DATABASE_URL != null && env.TURSO_AUTH_TOKEN != null && env.TURSO_DATABASE_URL.length !== 0 && env.TURSO_AUTH_TOKEN.length !== 0) {
+if (
+  env.TURSO_DATABASE_URL != null &&
+  env.TURSO_AUTH_TOKEN != null &&
+  env.TURSO_DATABASE_URL.length !== 0 &&
+  env.TURSO_AUTH_TOKEN.length !== 0
+) {
   const { PrismaLibSQL } = await import("@prisma/adapter-libsql");
   const { createClient } = await import("@libsql/client");
   const libsql = createClient({
