@@ -3,6 +3,7 @@ import type { ICard, ISet } from "~/lib/api/types";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import _sets from "~/lib/api/data/sets/en.json";
+import { env } from "~/env";
 
 const sets = _sets as ISet[];
 
@@ -38,12 +39,17 @@ export const requestRouter = createTRPCRouter({
       } catch (_e) {
         throw new Error("You've already requested this card!");
       }
+      const cardRequests = await ctx.db.request.count({
+        where: {
+          cardId: result.cardId,
+        },
+      });
       const publicMessage = {
         content: `Card Implementation Request: ${card.name} (${card.id})`,
         embeds: [
           {
             title: card.name,
-            description: `Set: ${set.name}`,
+            description: `Set: ${set.name}\nNo. of Requests: ${cardRequests}`,
             image: {
               url: card.images.large,
             },
@@ -51,11 +57,21 @@ export const requestRouter = createTRPCRouter({
         ],
       };
       // Private log message
-      const logMessage = {
+      const privateMessage = {
         content: `Log: Card Request\nCard: ${card.name} (${card.id})\nIP: ${result.ipAddress}\nTimestamp: ${result.createdAt.toISOString()}`,
       };
-
-      console.log(publicMessage);
+      await Promise.all([
+        fetch(env.PUBLIC_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(publicMessage),
+        }),
+        fetch(env.PRIVATE_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(privateMessage),
+        }),
+      ]);
     }),
   getAll: publicProcedure.query(async ({ ctx }) => {
     const ipAddress = ctx.headers.get("x-real-ip");

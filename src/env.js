@@ -13,6 +13,8 @@ export const env = createEnv({
       .default("development"),
     TURSO_DATABASE_URL: z.string().min(1).optional(),
     TURSO_AUTH_TOKEN: z.string().min(1).optional(),
+    PUBLIC_WEBHOOK_URL: z.string().url(),
+    PRIVATE_WEBHOOK_URL: z.string().url(),
   },
 
   /**
@@ -33,6 +35,8 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL,
     TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
+    PUBLIC_WEBHOOK_URL: process.env.PUBLIC_WEBHOOK_URL,
+    PRIVATE_WEBHOOK_URL: process.env.PRIVATE_WEBHOOK_URL,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
