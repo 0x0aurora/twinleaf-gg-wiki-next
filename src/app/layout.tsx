@@ -25,7 +25,8 @@ export default function RootLayout({
       className={`${GeistSans.variable}`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-screen flex-col md:flex-row bg-background">
+      {/* offset collapsable sidebar on mobile with after:h-20 */}
+      <body className="flex min-h-screen flex-col md:flex-row bg-background after:h-20 md:after:h-0">
         <QueryClientProvider>
           <TRPCReactProvider>
             <ThemeProvider
@@ -39,8 +40,6 @@ export default function RootLayout({
                 <ThemeToggle />
               </div>
               {children}
-              {/* offset sidebar on bottom */}
-              <div className="h-20" />
               <Toaster />
             </ThemeProvider>
           </TRPCReactProvider>
