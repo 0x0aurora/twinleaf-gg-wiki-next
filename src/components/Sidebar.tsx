@@ -1,17 +1,22 @@
 "use client";
 
 import SetsMenu from "~/components/SetsMenu";
-import Logo from "~/components/Logo.svg";
+import LogoSmall from "~/components/LogoSmall.svg";
 import Image from "next/image";
-import { ArrowUpIcon, ArrowRightIcon } from "lucide-react";
+import { ArrowUpIcon, ArrowRightIcon, Loader, GithubIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import * as React from "react";
 import { cn } from "~/lib/utils";
 import { usePathname } from "next/navigation";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { useToast } from "~/hooks/use-toast";
+import { type ISet } from "~/lib/api/types";
+import ThemeToggle from "./ThemeToggle";
+import Link from "next/link";
 
 export default function Sidebar() {
   const [expanded, setExpanded] = React.useState(false);
+  const { toast } = useToast();
   const pathname = usePathname();
   const setId = pathname.split("/").at(1);
 
@@ -19,7 +24,7 @@ export default function Sidebar() {
     setExpanded(false);
   }, [pathname]);
 
-  const setsQuery = useSuspenseQuery({
+  const setsQuery = useQuery({
     queryKey: ["https://api.pokemontcg.io/v2/sets/"],
     queryFn: async () => {
       const response = await fetch("https://api.pokemontcg.io/v2/sets/");
@@ -27,25 +32,27 @@ export default function Sidebar() {
         throw new Error("Network response was not ok");
       }
       return (await response.json()) as {
-        data: {
-          id: string;
-          name: string;
-          images: {
-            symbol: string;
-            logo: string;
-          };
-        }[];
+        data: ISet[];
       };
     },
   });
 
-  const currentSet = setsQuery.data.data.find((e) => e.id === setId);
+  React.useEffect(() => {
+    if (setsQuery.error == null) {
+      toast({
+        variant: "destructive",
+        title: "Could not fetch PTCG sets",
+      });
+    }
+  }, [setsQuery.error, toast]);
+
+  const currentSet = setsQuery.data?.data.find((e) => e.id === setId);
 
   return (
     <div
       className={cn(
-        `fixed flex bottom-0 top-[100%] inset-x-0 max-h-screen md:static
-        md:h-screen transition-all bg-background`,
+        `fixed flex bottom-0 top-[100%] left-0 right-0 max-h-screen md:static
+        md:h-screen transition-all bg-background z-50 group`,
         expanded && "top-16",
       )}
     >
@@ -62,11 +69,16 @@ export default function Sidebar() {
         </Button>
         <div
           className={cn(
-            `items-center justify-center flex h-20 w-full bg-background
+            `items-center justify-around flex h-20 w-full bg-background
             overflow-hidden transition-all border-t`,
             expanded && "h-0 border-t-0",
           )}
         >
+          <Button variant="outline" size="icon" asChild>
+            <Link href="/">
+              <GithubIcon />
+            </Link>
+          </Button>
           <Button
             onClick={() => setExpanded(!expanded)}
             variant={currentSet == null ? "outline" : "default"}
@@ -88,6 +100,7 @@ export default function Sidebar() {
               </>
             )}
           </Button>
+          <ThemeToggle />
         </div>
       </div>
       <div
@@ -96,12 +109,12 @@ export default function Sidebar() {
           transition-all`,
         )}
       >
-        <div className="hidden md:inline absolute left-[100%] p-3">
+        <div className="hidden md:inline absolute left-[calc(100%-2rem)] p-2.5">
           <Button
-            variant="outline"
             onClick={() => setExpanded(!expanded)}
             className={cn(
-              "rounded-full transition-all rotate-0",
+              `rounded-full transition-all rotate-0 opacity-0
+              group-hover:opacity-100`,
               expanded && "rotate-180",
             )}
             size="icon"
@@ -114,13 +127,20 @@ export default function Sidebar() {
             "py-3 px-6 w-full shadow-md justify-center hidden md:flex",
           )}
         >
-          <Image className="h-8 w-8" alt="Twinleaf Logo" {...Logo} />
+          <Image className="h-8 w-8" alt="Twinleaf Logo" {...LogoSmall} />
         </div>
-        <SetsMenu
-          sets={[...(setsQuery.data?.data ?? [])].reverse()}
-          className={cn("p-3 overflow-y-scroll flex-1 px-3")}
-          collapseTextForMobile={!expanded}
-        />
+
+        {setsQuery.status === "success" ? (
+          <SetsMenu
+            sets={[...setsQuery.data.data].reverse()}
+            className={cn("p-3 overflow-y-scroll flex-1 px-3")}
+            collapseTextForDesktop={!expanded}
+          />
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            <Loader className="text-primary animate-spin" />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -6,21 +6,16 @@ import { Button } from "./ui/button";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { cn } from "~/lib/utils";
+import { type ISet } from "~/lib/api/types";
 
 export interface SetsMenuProps
   extends React.ButtonHTMLAttributes<HTMLUListElement> {
-  collapseTextForMobile?: boolean;
-  sets: {
-    id: string;
-    name: string;
-    images: {
-      symbol: string;
-    };
-  }[];
+  collapseTextForDesktop?: boolean;
+  sets: ISet[];
 }
 
 const SetsMenu = React.forwardRef<HTMLUListElement, SetsMenuProps>(
-  ({ className, collapseTextForMobile, sets, ...props }, ref) => {
+  ({ className, collapseTextForDesktop, sets, ...props }, ref) => {
     const pathname = usePathname();
     return (
       <ul className={cn("flex flex-col gap-3", className)} {...props} ref={ref}>
@@ -29,7 +24,7 @@ const SetsMenu = React.forwardRef<HTMLUListElement, SetsMenuProps>(
             <Button
               className={cn(
                 "w-full justify-start",
-                collapseTextForMobile && "md:gap-0",
+                collapseTextForDesktop && "md:gap-0",
               )}
               variant={pathname === `/${set.id}` ? "default" : "ghost"}
               asChild
@@ -47,7 +42,7 @@ const SetsMenu = React.forwardRef<HTMLUListElement, SetsMenuProps>(
                 <span
                   className={cn(
                     "text-ellipsis overflow-hidden transition-all max-w-96",
-                    collapseTextForMobile && "max-w-0",
+                    collapseTextForDesktop && "md:max-w-0",
                   )}
                 >
                   {set.name}

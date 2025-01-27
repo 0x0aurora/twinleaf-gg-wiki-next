@@ -56,7 +56,17 @@ export default {
           "5": "hsl(var(--chart-5))",
         },
       },
+      keyframes: {
+        "thumbs-up": {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.2) rotate(20deg)" },
+          "100%": { transform: "scale(1)" },
+        },
+      },
+      animation: {
+        "thumbs-up": "thumbs-up 0.5s ease",
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
 } satisfies Config;

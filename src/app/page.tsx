@@ -1,14 +1,14 @@
-import { HydrateClient } from "~/trpc/server";
+import Image from "next/image";
+import Logo from "~/components/Logo.png";
 
-export default async function Home() {
+export default function Home() {
   return (
-    <HydrateClient>
-      <main
-        className="flex min-h-screen flex-col items-center justify-center
-          bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white"
-      >
-        hi
-      </main>
-    </HydrateClient>
+    <main className="flex-1 self-stretch flex items-center justify-center">
+      <div className="prose dark:prose-invert text-center">
+        <Image alt="Twinleaf Wiki Logo" {...Logo} />
+        <p>...</p>
+        <p>...</p>
+      </div>
+    </main>
   );
 }
