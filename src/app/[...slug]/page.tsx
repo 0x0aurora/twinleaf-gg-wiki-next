@@ -187,7 +187,7 @@ export default function Home({
                       ? "sepia(1) saturate(3) brightness(0.7) hue-rotate(300deg)"
                       : undefined,
                   }}
-                  blurDataURL={cardBackPlaceholder}
+                  placeholder={cardBackPlaceholder}
                   src={card.images.small}
                   alt={card.name}
                   height={250}
@@ -260,7 +260,7 @@ export default function Home({
               <Image
                 className="w-full h-auto"
                 src={cardQuery.data.data.images.large}
-                blurDataURL={cardBackPlaceholder}
+                placeholder={cardBackPlaceholder}
                 alt={cardQuery.data.data.name}
                 height={942}
                 width={674}
