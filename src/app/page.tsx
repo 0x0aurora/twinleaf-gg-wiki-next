@@ -13,7 +13,7 @@ export default function Home() {
           width={Logo.width}
         />
         <p>
-          Welcome to Twinleaf.gg's Wiki. Click on a set to start looking which
+          Welcome to Twinleaf.gg&apos;s Wiki. Click on a set to start looking which
           cards are currently integrated.
         </p>
         <p>
