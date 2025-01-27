@@ -2,10 +2,7 @@
 
 import * as React from "react";
 
-import {
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
@@ -46,7 +43,10 @@ export default function Home({
 
   const cardsQuery = useSuspenseQuery({
     queryKey: [setId],
-    queryFn: () => import(`~/lib/api/data/cards/en/${setId}.json`, { with: { type: "json" } }).then((e: { default: ICard[] }) => e.default),
+    queryFn: () =>
+      import(`~/lib/api/data/cards/en/${setId}.json`, {
+        with: { type: "json" },
+      }).then((e: { default: ICard[] }) => e.default),
   });
   const allCards = cardsQuery.data;
   const currentSet = sets.find((e) => e.id === setId);
@@ -205,8 +205,7 @@ export default function Home({
                     animationIterationCount: 1,
                   }}
                   className={cn(
-                    requestedCardIds.has(currentCard.id) &&
-                      "animate-thumbs-up",
+                    requestedCardIds.has(currentCard.id) && "animate-thumbs-up",
                     implementedCards.implementedCardIds.includes(
                       currentCard.id,
                     ) && "hidden",

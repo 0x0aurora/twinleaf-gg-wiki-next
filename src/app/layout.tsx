@@ -26,7 +26,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       {/* offset collapsable sidebar on mobile with after:h-20 */}
-      <body className="flex min-h-screen flex-col md:flex-row bg-background after:h-20 md:after:h-0">
+      <body
+        className="flex min-h-screen flex-col md:flex-row bg-background
+          after:h-20 md:after:h-0"
+      >
         <QueryClientProvider>
           <TRPCReactProvider>
             <ThemeProvider

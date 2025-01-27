@@ -11,16 +11,17 @@ export const requestRouter = createTRPCRouter({
     .input(z.object({ cardId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       let result: Prisma.RequestGetPayload<object>;
-      const setId = input.cardId.split('-', 2)[0]!;
+      const setId = input.cardId.split("-", 2)[0]!;
       const set = sets.find((e) => e.id === setId);
       if (set == null) {
         throw new Error(`Set ${setId} does not exist!`);
       }
       let cards: ICard[];
       try {
-        cards = await import(`~/lib/api/data/cards/en/${setId}.json`, { with: { type: "json" } }).then((e: { default: ICard[] }) => e.default);
-      }
-      catch (_e) {
+        cards = await import(`~/lib/api/data/cards/en/${setId}.json`, {
+          with: { type: "json" },
+        }).then((e: { default: ICard[] }) => e.default);
+      } catch (_e) {
         throw new Error(`Set ${setId} does not exist!`);
       }
       const card = cards.find((e) => e.id === input.cardId);
