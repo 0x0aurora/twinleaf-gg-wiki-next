@@ -21,7 +21,7 @@ import { api } from "~/trpc/react";
 import { useToast } from "~/hooks/use-toast";
 import implementedCards from "~/lib/card-data/implemented-cards.json" with { type: "json" };
 import buggedCards from "~/lib/card-data/bugged-cards.json" with { type: "json" };
-import cardBackPlaceholder from "~/lib/cardBackPlaceholder";
+import cardBackPlaceholder from "~/lib/card-back-placeholder";
 import { Input } from "~/components/ui/input";
 import type { ISet, ICard } from "~/lib/api/types";
 import { ScrollArea } from "~/components/ui/scroll-area";

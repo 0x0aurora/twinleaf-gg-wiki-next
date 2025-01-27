@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Update Packages
+      - name: Update Submodules
         run: |
           git pull --recurse-submodules
           git submodule update --remote --recursive
