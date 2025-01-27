@@ -3,24 +3,22 @@
 import SetsMenu from "~/components/SetsMenu";
 import _LogoSmall from "~/components/LogoSmall.svg";
 import Image, { type StaticImageData } from "next/image";
-import { ArrowUpIcon, ArrowRightIcon, Loader, GithubIcon } from "lucide-react";
+import { ArrowUpIcon, ArrowRightIcon, GithubIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import * as React from "react";
 import { cn } from "~/lib/utils";
 import { usePathname } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { useToast } from "~/hooks/use-toast";
-import { type ISet } from "~/lib/api/types";
-
+import _sets from "~/lib/api/data/sets/en.json";
 import ThemeToggle from "./ThemeToggle";
 import Link from "next/link";
+import type { ISet } from "~/lib/api/types";
 
+const sets = _sets as ISet[];
 const LogoSmall = _LogoSmall as StaticImageData;
 
 export default function Sidebar() {
   const [expanded, setExpanded] = React.useState(false);
-  const { toast } = useToast();
   const pathname = usePathname();
   const setId = pathname.split("/").at(1);
 
@@ -28,29 +26,7 @@ export default function Sidebar() {
     setExpanded(false);
   }, [pathname]);
 
-  const setsQuery = useQuery({
-    queryKey: ["https://api.pokemontcg.io/v2/sets/"],
-    queryFn: async () => {
-      const response = await fetch("https://api.pokemontcg.io/v2/sets/");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return (await response.json()) as {
-        data: ISet[];
-      };
-    },
-  });
-
-  React.useEffect(() => {
-    if (setsQuery.error == null) {
-      toast({
-        variant: "destructive",
-        title: "Could not fetch PTCG sets",
-      });
-    }
-  }, [setsQuery.error, toast]);
-
-  const currentSet = setsQuery.data?.data.find((e) => e.id === setId);
+  const currentSet = sets.find((e) => e.id === setId);
 
   return (
     <div
@@ -144,19 +120,12 @@ export default function Sidebar() {
             />
           </Link>
         </div>
-
-        {setsQuery.status === "success" ? (
-          <ScrollArea className="p-3 flex-1">
-            <SetsMenu
-              sets={[...setsQuery.data.data].reverse()}
-              collapseTextForDesktop={!expanded}
-            />
-          </ScrollArea>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <Loader className="text-primary animate-spin" />
-          </div>
-        )}
+        <ScrollArea className="p-3 flex-1">
+          <SetsMenu
+            sets={[...sets].reverse()}
+            collapseTextForDesktop={!expanded}
+          />
+        </ScrollArea>
       </div>
     </div>
   );

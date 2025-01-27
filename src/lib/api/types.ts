@@ -1,12 +1,9 @@
-export enum Legality {
-  LEGAL = "Legal",
-  BANNED = "Banned",
-}
+export type Legality = "Legal" | "Banned";
 
 export interface ILegality {
-  expanded: Legality | undefined;
-  standard: Legality | undefined;
-  unlimited: Legality | undefined;
+  expanded?: Legality;
+  standard?: Legality;
+  unlimited?: Legality;
 }
 
 export interface ISetImage {
@@ -44,13 +41,13 @@ export interface ICard {
   rules?: string[];
   retreatCost?: string[];
   convertedRetreatCost?: number;
-  set: ISet;
+  // set: ISet;
   number: string;
   artist?: string;
   rarity: string;
   flavorText?: string;
   nationalPokedexNumbers?: number[];
   legalities: ILegality;
-  regulationMark?: string;
+  // regulationMark?: string;
   images: ICardImage;
 }

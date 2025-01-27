@@ -3,14 +3,12 @@
 import * as React from "react";
 
 import {
-  useQuery,
   useQueryClient,
-  useSuspenseInfiniteQuery,
+  useSuspenseQuery,
 } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
-import { Card } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -19,15 +17,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Loader } from "lucide-react";
 import { api } from "~/trpc/react";
 import { useToast } from "~/hooks/use-toast";
 import implementedCards from "~/lib/card-data/implemented-cards.json" with { type: "json" };
 import buggedCards from "~/lib/card-data/bugged-cards.json" with { type: "json" };
 import cardBackPlaceholder from "~/lib/cardBackPlaceholder";
 import { Input } from "~/components/ui/input";
-import { type ICard } from "~/lib/api/types";
+import type { ISet, ICard } from "~/lib/api/types";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import _sets from "~/lib/api/data/sets/en.json";
+
+const sets = _sets as ISet[];
 
 export default function Home({
   params,
@@ -44,67 +44,13 @@ export default function Home({
   const [searchTerm, setSearchTerm] = React.useState("");
   const canonicalSetLinkRef = React.useRef<HTMLAnchorElement>(null);
 
-  const cardsQuery = useSuspenseInfiniteQuery({
-    queryKey: [`https://api.pokemontcg.io/v2/cards/?q=set.id:${setId}`],
-    queryFn: async ({ pageParam }) => {
-      const response = await fetch(
-        `https://api.pokemontcg.io/v2/cards/?q=set.id:${setId}&page=${pageParam}`,
-      );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return (await response.json()) as {
-        data: ICard[];
-        page: number;
-        pageSize: number;
-        count: number;
-        totalCount: number;
-      };
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.page * lastPage.pageSize >= lastPage.totalCount
-        ? null
-        : lastPage.page + 1,
+  const cardsQuery = useSuspenseQuery({
+    queryKey: [setId],
+    queryFn: () => import(`~/lib/api/data/cards/en/${setId}.json`, { with: { type: "json" } }).then((e: { default: ICard[] }) => e.default),
   });
-  const allCards = cardsQuery.data?.pages.flatMap((e) => e.data);
-  const currentSet = allCards[0]?.set;
-
-  const observer = React.useRef<IntersectionObserver | undefined>(undefined);
-  const lastPostElementRef = React.useCallback(
-    (node: HTMLElement | null) => {
-      if (cardsQuery.isFetchingNextPage) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0]?.isIntersecting) {
-          void cardsQuery.fetchNextPage();
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [cardsQuery],
-  );
-
-  const cardQuery = useQuery({
-    queryKey: [`https://api.pokemontcg.io/v2/cards/${cardId}`],
-    enabled: cardId != null,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    queryFn: async () => {
-      const response = await fetch(
-        `https://api.pokemontcg.io/v2/cards/${cardId}`,
-      );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return (await response.json()) as {
-        data: ICard;
-      };
-    },
-  });
+  const allCards = cardsQuery.data;
+  const currentSet = sets.find((e) => e.id === setId);
+  const currentCard = cardsQuery.data.find((e) => e.id === cardId);
 
   const [requestedCardRows] = api.request.getAll.useSuspenseQuery();
   const requestedCardIds = React.useMemo(
@@ -223,21 +169,6 @@ export default function Home({
                 </div>
               </Link>
             ))}
-          <Card
-            className={cn(
-              "flex justify-center items-center aspect-[18/25]",
-              !cardsQuery.hasNextPage && "hidden",
-            )}
-            ref={lastPostElementRef}
-          >
-            {cardsQuery.isFetchingNextPage ? (
-              <Loader className="text-primary animate-spin" />
-            ) : (
-              <Button onClick={() => cardsQuery.fetchNextPage()}>
-                Load more...
-              </Button>
-            )}
-          </Card>
         </div>
         <Link ref={canonicalSetLinkRef} className="hidden" href={`/${setId}`} />
         <Dialog
@@ -252,48 +183,41 @@ export default function Home({
             setCardId(undefined);
           }}
         >
-          {cardQuery.status === "success" ? (
+          {currentCard != null ? (
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>{cardQuery.data.data.name}</DialogTitle>
+                <DialogTitle>{currentCard.name}</DialogTitle>
               </DialogHeader>
               <Image
                 className="w-full h-auto"
-                src={cardQuery.data.data.images.large}
                 placeholder={cardBackPlaceholder}
-                alt={cardQuery.data.data.name}
+                src={currentCard.images.large}
+                alt={currentCard.name}
                 height={942}
                 width={674}
               />
               <DialogFooter>
                 <Button
                   onClick={async () => {
-                    await onRequest(cardQuery.data.data.id);
+                    await onRequest(currentCard.id);
                   }}
                   style={{
                     animationIterationCount: 1,
                   }}
                   className={cn(
-                    requestedCardIds.has(cardQuery.data.data.id) &&
+                    requestedCardIds.has(currentCard.id) &&
                       "animate-thumbs-up",
                     implementedCards.implementedCardIds.includes(
-                      cardQuery.data.data.id,
+                      currentCard.id,
                     ) && "hidden",
                   )}
-                  disabled={requestedCardIds.has(cardQuery.data.data.id)}
+                  disabled={requestedCardIds.has(currentCard.id)}
                 >
-                  {!requestedCardIds.has(cardQuery.data.data.id)
+                  {!requestedCardIds.has(currentCard.id)
                     ? "Request"
                     : "Requested 👍"}
                 </Button>
               </DialogFooter>
-            </DialogContent>
-          ) : cardQuery.status === "pending" ? (
-            <DialogContent>
-              <DialogTitle>Loading card...</DialogTitle>
-              <div className="flex items-center justify-center">
-                <Loader className="animate-spin text-primary" />
-              </div>
             </DialogContent>
           ) : (
             <DialogContent>

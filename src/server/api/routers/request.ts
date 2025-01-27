@@ -1,15 +1,32 @@
 import type { Prisma } from "@prisma/client";
-
+import type { ICard, ISet } from "~/lib/api/types";
 import { z } from "zod";
-import { type ICard } from "~/lib/api/types";
-
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import _sets from "~/lib/api/data/sets/en.json";
+
+const sets = _sets as ISet[];
 
 export const requestRouter = createTRPCRouter({
   create: publicProcedure
     .input(z.object({ cardId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       let result: Prisma.RequestGetPayload<object>;
+      const setId = input.cardId.split('-', 2)[0]!;
+      const set = sets.find((e) => e.id === setId);
+      if (set == null) {
+        throw new Error(`Set ${setId} does not exist!`);
+      }
+      let cards: ICard[];
+      try {
+        cards = await import(`~/lib/api/data/cards/en/${setId}.json`, { with: { type: "json" } }).then((e: { default: ICard[] }) => e.default);
+      }
+      catch (_e) {
+        throw new Error(`Set ${setId} does not exist!`);
+      }
+      const card = cards.find((e) => e.id === input.cardId);
+      if (card == null) {
+        throw new Error(`Card ${input.cardId} does not exist!`);
+      }
       try {
         result = await ctx.db.request.create({
           data: {
@@ -20,28 +37,21 @@ export const requestRouter = createTRPCRouter({
       } catch (_e) {
         throw new Error("You've already requested this card!");
       }
-      const cardResponse = await fetch(
-        `https://api.pokemontcg.io/v2/cards/${result.cardId}`,
-      );
-      if (!cardResponse.ok) {
-        throw new Error("Could not get card details from API!");
-      }
-      const card = (await cardResponse.json()) as { data: ICard };
       const publicMessage = {
-        content: `Card Implementation Request: ${card.data.name} (${card.data.id})`,
+        content: `Card Implementation Request: ${card.name} (${card.id})`,
         embeds: [
           {
-            title: card.data.name,
-            description: `Set: ${card.data.set.name}`,
+            title: card.name,
+            description: `Set: ${set.name}`,
             image: {
-              url: card.data.images.large,
+              url: card.images.large,
             },
           },
         ],
       };
       // Private log message
       const logMessage = {
-        content: `Log: Card Request\nCard: ${card.data.name} (${card.data.id})\nIP: ${result.ipAddress}\nTimestamp: ${result.createdAt.toISOString()}`,
+        content: `Log: Card Request\nCard: ${card.name} (${card.id})\nIP: ${result.ipAddress}\nTimestamp: ${result.createdAt.toISOString()}`,
       };
 
       console.log(publicMessage);
