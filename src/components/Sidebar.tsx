@@ -102,7 +102,10 @@ export default function Sidebar() {
               </>
             )}
           </Button>
-          <ThemeToggle />
+          {/* fix improper hiding of themetoggle with overflow */}
+          <div className={cn(expanded && "hidden")}>
+            <ThemeToggle />
+          </div>
         </div>
       </div>
       <div
