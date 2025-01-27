@@ -7,8 +7,6 @@ import { TRPCReactProvider } from "~/trpc/react";
 import QueryClientProvider from "~/providers/QueryClientProvider";
 import Sidebar from "~/components/Sidebar";
 import { Toaster } from "~/components/ui/toaster";
-import { Suspense } from "react";
-import { Loader } from "lucide-react";
 import { ThemeProvider } from "~/providers/ThemeProvider";
 import ThemeToggle from "~/components/ThemeToggle";
 
@@ -40,22 +38,9 @@ export default function RootLayout({
               <div className="hidden md:inline fixed top-3 right-3 z-50">
                 <ThemeToggle />
               </div>
-              <Suspense
-                fallback={
-                  <main
-                    className="flex-1 self-stretch flex items-center
-                      justify-center"
-                  >
-                    <div>
-                      <Loader className="text-primary animate-spin" />
-                    </div>
-                  </main>
-                }
-              >
-                {children}
-                {/* offset sidebar on bottom */}
-                <div className="h-20" />
-              </Suspense>
+              {children}
+              {/* offset sidebar on bottom */}
+              <div className="h-20" />
               <Toaster />
             </ThemeProvider>
           </TRPCReactProvider>
