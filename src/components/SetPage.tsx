@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
