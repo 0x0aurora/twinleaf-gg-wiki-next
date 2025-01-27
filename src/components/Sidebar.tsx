@@ -5,12 +5,14 @@ import _LogoSmall from "~/components/LogoSmall.svg";
 import Image, { type StaticImageData } from "next/image";
 import { ArrowUpIcon, ArrowRightIcon, Loader, GithubIcon } from "lucide-react";
 import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
 import * as React from "react";
 import { cn } from "~/lib/utils";
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "~/hooks/use-toast";
 import { type ISet } from "~/lib/api/types";
+
 import ThemeToggle from "./ThemeToggle";
 import Link from "next/link";
 
@@ -144,11 +146,12 @@ export default function Sidebar() {
         </div>
 
         {setsQuery.status === "success" ? (
-          <SetsMenu
-            sets={[...setsQuery.data.data].reverse()}
-            className={cn("p-3 overflow-y-scroll flex-1 px-3")}
-            collapseTextForDesktop={!expanded}
-          />
+          <ScrollArea className="p-3 flex-1">
+            <SetsMenu
+              sets={[...setsQuery.data.data].reverse()}
+              collapseTextForDesktop={!expanded}
+            />
+          </ScrollArea>
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <Loader className="text-primary animate-spin" />

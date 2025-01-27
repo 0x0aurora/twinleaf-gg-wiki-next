@@ -27,6 +27,7 @@ import buggedCards from "~/lib/card-data/bugged-cards.json" with { type: "json" 
 import cardBackPlaceholder from "~/lib/cardBackPlaceholder";
 import { Input } from "~/components/ui/input";
 import { type ICard } from "~/lib/api/types";
+import { ScrollArea } from "~/components/ui/scroll-area";
 
 export default function Home({
   params,
@@ -131,170 +132,176 @@ export default function Home({
   };
 
   return (
-    <main
-      className="flex-1 md:max-h-screen overflow-y-scroll w-full p-3 space-y-6"
-    >
-      <div className="prose dark:prose-invert">
-        <h1>{currentSet?.name}</h1>
-        <p>
-          {[
-            currentSet?.series,
-            `Released on ${currentSet?.releaseDate}`,
-            `Standard: ${currentSet?.legalities.standard ? "✅" : "❌"}`,
-            `Expanded: ${currentSet?.legalities.expanded ? "✅" : "❌"}`,
-            `Unlimited: ${currentSet?.legalities.unlimited ? "✅" : "❌"}`,
-          ].join(" • ")}
-        </p>
-      </div>
-      <Input
-        className=""
-        value={searchTerm}
-        onInput={(e) => setSearchTerm(e.currentTarget.value)}
-        placeholder=" Search for a card..."
-      />
-      <div
-        className="grid grid-cols-[repeat(2,minmax(0px,1fr))]
-          md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3"
-      >
-        {allCards
-          .filter((e) => e.name.toLowerCase().includes(searchTerm))
-          ?.map((card, i) => (
-            <Link
-              className="relative"
-              onClick={(e) => {
-                e.preventDefault();
-                // shallow route
-                window.history.pushState(null, "", e.currentTarget.href);
-                // preload
-                queryClient.setQueryData(
-                  [`https://api.pokemontcg.io/v2/cards/${card.id}`],
-                  { data: card },
-                );
-                setCardId(card.id);
-              }}
-              href={`/${setId}/${card.id}`}
-              key={i}
-            >
-              <Image
-                loading="lazy"
-                className={cn(
-                  "w-full h-auto",
-                  !implementedCards.implementedCardIds.includes(card.id) &&
-                    "grayscale",
-                )}
-                style={{
-                  filter: buggedCards.buggedCardIds.includes(card.id)
-                    ? "sepia(1) saturate(3) brightness(0.7) hue-rotate(300deg)"
-                    : undefined,
+    <ScrollArea className="flex-1 md:max-h-screen w-full">
+      <main className="p-3 space-y-6">
+        <div className="prose dark:prose-invert">
+          <h1>{currentSet?.name}</h1>
+          <p>
+            {[
+              currentSet?.series,
+              `Released on ${currentSet?.releaseDate}`,
+              `Standard: ${currentSet?.legalities.standard ? "✅" : "❌"}`,
+              `Expanded: ${currentSet?.legalities.expanded ? "✅" : "❌"}`,
+              `Unlimited: ${currentSet?.legalities.unlimited ? "✅" : "❌"}`,
+            ].join(" • ")}
+          </p>
+        </div>
+        <Input
+          className=""
+          value={searchTerm}
+          onInput={(e) => setSearchTerm(e.currentTarget.value)}
+          placeholder=" Search for a card..."
+        />
+        <div
+          className="grid grid-cols-[repeat(2,minmax(0px,1fr))]
+            md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3"
+        >
+          {allCards
+            .filter((e) => e.name.toLowerCase().includes(searchTerm))
+            ?.map((card, i) => (
+              <Link
+                className="relative"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // shallow route
+                  window.history.pushState(null, "", e.currentTarget.href);
+                  // preload
+                  queryClient.setQueryData(
+                    [`https://api.pokemontcg.io/v2/cards/${card.id}`],
+                    { data: card },
+                  );
+                  setCardId(card.id);
                 }}
-                blurDataURL={cardBackPlaceholder}
-                src={card.images.small}
-                alt={card.name}
-                height={250}
-                width={180}
-              />
-              <div
-                className={cn(
-                  `absolute inset-0 md:backdrop-blur-sm md:opacity-0
-                  hover:opacity-100 transition-all rounded-xl flex items-center
-                  justify-center`,
-                  implementedCards.implementedCardIds.includes(card.id) &&
-                    "hidden",
-                )}
+                href={`/${setId}/${card.id}`}
+                key={i}
               >
+                <Image
+                  loading="lazy"
+                  className={cn(
+                    "w-full h-auto",
+                    !implementedCards.implementedCardIds.includes(card.id) &&
+                      "grayscale",
+                  )}
+                  style={{
+                    filter: buggedCards.buggedCardIds.includes(card.id)
+                      ? "sepia(1) saturate(3) brightness(0.7) hue-rotate(300deg)"
+                      : undefined,
+                  }}
+                  blurDataURL={cardBackPlaceholder}
+                  src={card.images.small}
+                  alt={card.name}
+                  height={250}
+                  width={180}
+                />
+                <div
+                  className={cn(
+                    `absolute inset-0 md:backdrop-blur-sm md:opacity-0
+                    hover:opacity-100 transition-all rounded-xl flex
+                    items-center justify-center`,
+                    implementedCards.implementedCardIds.includes(card.id) &&
+                      "hidden",
+                  )}
+                >
+                  <Button
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      await onRequest(card.id);
+                    }}
+                    style={{
+                      animationIterationCount: 1,
+                    }}
+                    className={cn(
+                      requestedCardIds.has(card.id) && "animate-thumbs-up",
+                    )}
+                    disabled={requestedCardIds.has(card.id)}
+                  >
+                    {!requestedCardIds.has(card.id)
+                      ? "Request"
+                      : "Requested 👍"}
+                  </Button>
+                </div>
+              </Link>
+            ))}
+          <Card
+            className={cn(
+              "flex justify-center items-center aspect-[18/25]",
+              !cardsQuery.hasNextPage && "hidden",
+            )}
+            ref={lastPostElementRef}
+          >
+            {cardsQuery.isFetchingNextPage ? (
+              <Loader className="text-primary animate-spin" />
+            ) : (
+              <Button onClick={() => cardsQuery.fetchNextPage()}>
+                Load more...
+              </Button>
+            )}
+          </Card>
+        </div>
+        <Link ref={canonicalSetLinkRef} className="hidden" href={`/${setId}`} />
+        <Dialog
+          open={cardId != null}
+          onOpenChange={() => {
+            // shallow route
+            window.history.pushState(
+              null,
+              "",
+              canonicalSetLinkRef.current!.href,
+            );
+            setCardId(undefined);
+          }}
+        >
+          {cardQuery.status === "success" ? (
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{cardQuery.data.data.name}</DialogTitle>
+              </DialogHeader>
+              <Image
+                className="w-full h-auto"
+                src={cardQuery.data.data.images.large}
+                blurDataURL={cardBackPlaceholder}
+                alt={cardQuery.data.data.name}
+                height={942}
+                width={674}
+              />
+              <DialogFooter>
                 <Button
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    await onRequest(card.id);
+                  onClick={async () => {
+                    await onRequest(cardQuery.data.data.id);
                   }}
                   style={{
                     animationIterationCount: 1,
                   }}
                   className={cn(
-                    requestedCardIds.has(card.id) && "animate-thumbs-up",
+                    requestedCardIds.has(cardQuery.data.data.id) &&
+                      "animate-thumbs-up",
+                    implementedCards.implementedCardIds.includes(
+                      cardQuery.data.data.id,
+                    ) && "hidden",
                   )}
-                  disabled={requestedCardIds.has(card.id)}
+                  disabled={requestedCardIds.has(cardQuery.data.data.id)}
                 >
-                  {!requestedCardIds.has(card.id) ? "Request" : "Requested 👍"}
+                  {!requestedCardIds.has(cardQuery.data.data.id)
+                    ? "Request"
+                    : "Requested 👍"}
                 </Button>
+              </DialogFooter>
+            </DialogContent>
+          ) : cardQuery.status === "pending" ? (
+            <DialogContent>
+              <DialogTitle>Loading card...</DialogTitle>
+              <div className="flex items-center justify-center">
+                <Loader className="animate-spin text-primary" />
               </div>
-            </Link>
-          ))}
-        <Card
-          className={cn(
-            "flex justify-center items-center aspect-[18/25]",
-            !cardsQuery.hasNextPage && "hidden",
-          )}
-          ref={lastPostElementRef}
-        >
-          {cardsQuery.isFetchingNextPage ? (
-            <Loader className="text-primary animate-spin" />
+            </DialogContent>
           ) : (
-            <Button onClick={() => cardsQuery.fetchNextPage()}>
-              Load more...
-            </Button>
+            <DialogContent>
+              <DialogTitle>Error loading card!</DialogTitle>
+            </DialogContent>
           )}
-        </Card>
-      </div>
-      <Link ref={canonicalSetLinkRef} className="hidden" href={`/${setId}`} />
-      <Dialog
-        open={cardId != null}
-        onOpenChange={() => {
-          // shallow route
-          window.history.pushState(null, "", canonicalSetLinkRef.current!.href);
-          setCardId(undefined);
-        }}
-      >
-        {cardQuery.status === "success" ? (
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{cardQuery.data.data.name}</DialogTitle>
-            </DialogHeader>
-            <Image
-              className="w-full h-auto"
-              src={cardQuery.data.data.images.large}
-              blurDataURL={cardBackPlaceholder}
-              alt={cardQuery.data.data.name}
-              height={942}
-              width={674}
-            />
-            <DialogFooter>
-              <Button
-                onClick={async () => {
-                  await onRequest(cardQuery.data.data.id);
-                }}
-                style={{
-                  animationIterationCount: 1,
-                }}
-                className={cn(
-                  requestedCardIds.has(cardQuery.data.data.id) &&
-                    "animate-thumbs-up",
-                  implementedCards.implementedCardIds.includes(
-                    cardQuery.data.data.id,
-                  ) && "hidden",
-                )}
-                disabled={requestedCardIds.has(cardQuery.data.data.id)}
-              >
-                {!requestedCardIds.has(cardQuery.data.data.id)
-                  ? "Request"
-                  : "Requested 👍"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        ) : cardQuery.status === "pending" ? (
-          <DialogContent>
-            <DialogTitle>Loading card...</DialogTitle>
-            <div className="flex items-center justify-center">
-              <Loader className="animate-spin text-primary" />
-            </div>
-          </DialogContent>
-        ) : (
-          <DialogContent>
-            <DialogTitle>Error loading card!</DialogTitle>
-          </DialogContent>
-        )}
-      </Dialog>
-    </main>
+        </Dialog>
+      </main>
+    </ScrollArea>
   );
 }
