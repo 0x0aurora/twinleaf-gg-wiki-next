@@ -47,10 +47,14 @@ export const requestRouter = createTRPCRouter({
       console.log(publicMessage);
     }),
   getAll: publicProcedure.query(async ({ ctx }) => {
+    const ipAddress = ctx.headers.get("x-real-ip");
+    if (ipAddress == null) {
+      throw new Error("Could not determine IP address!")
+    } 
     try {
       return await ctx.db.request.findMany({
         where: {
-          ipAddress: ctx.headers.get("x-real-ip")!,
+          ipAddress,
         },
         select: {
           cardId: true,
