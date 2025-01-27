@@ -3,6 +3,7 @@ import * as React from "react";
 import type { ISet, ICard } from "~/lib/api/types";
 import _sets from "~/lib/api/data/sets/en.json";
 import SetPage from "~/components/SetPage";
+import { api, HydrateClient } from "~/trpc/server";
 
 const sets = _sets as ISet[];
 
@@ -22,5 +23,10 @@ export default async function Set({
     with: { type: "json" },
   }).then((e: { default: ICard[] }) => e.default);
   const card = cards.find((e) => e.id === cardId);
-  return <SetPage set={set} card={card} cards={cards} />;
+  void api.request.getAll.prefetch();
+  return (
+    <HydrateClient>
+      <SetPage set={set} card={card} cards={cards} />
+    </HydrateClient>
+  );
 }

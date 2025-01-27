@@ -32,7 +32,6 @@ export default function SetPage({
   cards: ICard[];
 }) {
   const trpcUtils = api.useUtils();
-  const queryClient = useQueryClient();
   const { toast } = useToast();
   const [currentCard, setCurrentCard] = React.useState(card);
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -97,11 +96,6 @@ export default function SetPage({
                   e.preventDefault();
                   // shallow route
                   window.history.pushState(null, "", e.currentTarget.href);
-                  // preload
-                  queryClient.setQueryData(
-                    [`https://api.pokemontcg.io/v2/cards/${card.id}`],
-                    { data: card },
-                  );
                   setCurrentCard(card);
                 }}
                 href={`/${currentSet.id}/${card.id}`}
