@@ -67,7 +67,7 @@ export default function Sidebar() {
               "Select a set..."
             ) : (
               <>
-                <div className="min-w-8 min-h-8">
+                <div className="w-8 h-8">
                   <Image
                     className="w-full h-auto block"
                     src={currentSet.images.symbol}
