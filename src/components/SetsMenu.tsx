@@ -37,6 +37,7 @@ const SetsMenu = React.forwardRef<HTMLUListElement, SetsMenuProps>(
                     height={32}
                     width={32}
                     alt={set.name}
+                    loading="lazy"
                   />
                 </div>
                 <span
