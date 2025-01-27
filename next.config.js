@@ -5,6 +5,14 @@
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+    images: {
+        remotePatterns: [
+            {
+                hostname: "images.pokemontcg.io"
+            }
+        ]
+    }
+};
 
 export default config;
