@@ -88,7 +88,7 @@ export default function Sidebar() {
       </div>
       <div
         className={cn(
-          `w-full md:max-w-64 flex flex-col h-full border-r border-t relative
+          `w-full flex flex-col h-full border-r border-t relative
           transition-all`,
         )}
       >
@@ -121,11 +121,13 @@ export default function Sidebar() {
           </Link>
         </div>
         <ScrollArea className="flex-1">
-          <SetsMenu
-            className="p-3"
-            sets={[...sets].reverse()}
-            collapseTextForDesktop={!expanded}
-          />
+          <div>
+            <SetsMenu
+              className="p-3 md:max-w-64"
+              sets={[...sets].reverse()}
+              collapseTextForDesktop={!expanded}
+            />
+          </div>
         </ScrollArea>
       </div>
     </div>
