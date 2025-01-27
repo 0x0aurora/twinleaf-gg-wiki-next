@@ -2,7 +2,11 @@
 
 import * as React from "react";
 
-import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
@@ -98,7 +102,10 @@ export default function Home({
               // shallow route
               window.history.pushState(null, "", evt.currentTarget.href);
               // preload
-              queryClient.setQueryData([`https://api.pokemontcg.io/v2/cards/${e.id}`], { data: e });
+              queryClient.setQueryData(
+                [`https://api.pokemontcg.io/v2/cards/${e.id}`],
+                { data: e },
+              );
               setCardId(e.id);
             }}
             href={`/${setId}/${e.id}`}
