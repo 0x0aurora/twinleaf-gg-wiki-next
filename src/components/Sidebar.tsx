@@ -41,7 +41,7 @@ export default function Sidebar() {
 
     const currentSet = setsQuery.data.data.find((e) => e.id === setId);
 
-    return <div className={cn("fixed flex bottom-0 inset-x-0 top-[100%] max-h-screen md:static md:h-screen transition-all bg-background", expanded && "top-16")}>
+    return <div className={cn("fixed flex bottom-0 top-[100%] inset-x-0 max-h-screen md:static md:h-screen transition-all bg-background", expanded && "top-16")}>
         <div className="absolute bottom-[100%] inset-x-0 text-center">
             <Button onClick={() => setExpanded(!expanded)} className={cn("rounded-full transition-all rotate-0 mb-3", expanded && "rotate-180")} size="icon">
                 <ArrowUpIcon />
