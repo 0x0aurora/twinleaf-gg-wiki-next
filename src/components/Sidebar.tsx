@@ -16,19 +16,19 @@ export default function Sidebar() {
         setExpanded(false);
     }, [pathname]);
     return <div className={cn("fixed flex bottom-0 inset-x-0 top-[100%] max-h-screen md:static md:h-screen transition-all bg-background", expanded && "top-16")}>
-        <div className="absolute -top-12 inset-x-0 text-center">
+        <div className="absolute bottom-[100%] inset-x-0 text-center mb-3">
             <Button onClick={() => setExpanded(!expanded)} className={cn("rounded-full transition-all rotate-0", expanded && "rotate-180")} size="icon">
                 <ArrowUpIcon />
             </Button>
         </div>
-        <div className={cn("w-full md:w-64 md:max-w-full flex flex-col h-full border-r border-t relative transition-all", !expanded && "md:max-w-[90px]")}>
-            <div className="py-3 px-6 shadow-md"><Image className="h-8 w-8" alt="Twinleaf Logo" {...Logo} /></div>
-            <SetsMenu className="p-3 overflow-y-scroll flex-1 px-3" />
-        </div>
-        <div className="hidden md:inline p-3">
-            <Button onClick={() => setExpanded(!expanded)} className={cn("rounded-full transition-all rotate-0", expanded && "rotate-180")} size="icon">
-                <ArrowRightIcon />
-            </Button>
+        <div className={cn("w-full md:max-w-64 flex flex-col h-full border-r border-t relative transition-all")}>
+            <div className="hidden md:inline absolute left-[100%] p-3">
+                <Button variant="outline" onClick={() => setExpanded(!expanded)} className={cn("rounded-full transition-all rotate-0", expanded && "rotate-180")} size="icon">
+                    <ArrowRightIcon />
+                </Button>
+            </div>
+            <div className={cn("py-3 px-6 w-full shadow-md flex justify-center")}><Image className="h-8 w-8" alt="Twinleaf Logo" {...Logo} /></div>
+            <SetsMenu className={cn("p-3 overflow-y-scroll flex-1 px-3")} collapseTextForMobile={!expanded} />
         </div>
     </div>;
 }

@@ -11,10 +11,11 @@ import { cn } from "~/lib/utils";
 
 export interface SetsMenuProps
   extends React.ButtonHTMLAttributes<HTMLUListElement> {
+    collapseTextForMobile?: boolean,
 }
 
 const SetsMenu = React.forwardRef<HTMLUListElement, SetsMenuProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, collapseTextForMobile, ...props }, ref) => {
     const pathname = usePathname();
     const setsQuery = useSuspenseQuery({
         queryKey: ['https://api.pokemontcg.io/v2/sets/'],
@@ -39,10 +40,12 @@ const SetsMenu = React.forwardRef<HTMLUListElement, SetsMenuProps>(
         {
             [...setsQuery.data?.data ?? []].reverse().map((set) => 
                 <li className="w-full" key={set.id}>
-                    <Button className="w-full justify-start" variant={pathname === `/${set.id}` ? "default" : "ghost"} asChild>
+                    <Button className={cn("w-full justify-start", collapseTextForMobile && "gap-0")} variant={pathname === `/${set.id}` ? "default" : "ghost"} asChild>
                         <Link href={`/${set.id}`}>
-                            <Image className="w-8 h-8 object-contain" src={set.images.symbol} height={32} width={32} alt={set.name} />
-                            <span className="text-ellipsis overflow-hidden">{set.name}</span>
+                            <div className="min-w-8 min-h-8">
+                                <Image className="w-full h-auto block" src={set.images.symbol} height={32} width={32} alt={set.name} />
+                            </div>
+                            <span className={cn("text-ellipsis overflow-hidden transition-all max-w-96", collapseTextForMobile && "max-w-0")}>{set.name}</span>
                         </Link>
                     </Button>
                 </li>
