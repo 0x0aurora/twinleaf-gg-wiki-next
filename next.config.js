@@ -12,6 +12,7 @@ const config = {
         hostname: "images.pokemontcg.io",
       },
     ],
+    unoptimized: true,
   },
   experimental: {
     scrollRestoration: true,
