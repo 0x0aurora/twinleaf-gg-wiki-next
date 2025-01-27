@@ -19,4 +19,6 @@ model Request {
     // updatedAt DateTime @updatedAt
 
     @@unique([cardId, ipAddress])
+    @@index([ipAddress])
+    @@index([cardId])
 }
