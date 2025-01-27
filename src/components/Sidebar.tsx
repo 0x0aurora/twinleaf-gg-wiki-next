@@ -1,8 +1,8 @@
 "use client";
 
 import SetsMenu from "~/components/SetsMenu";
-import LogoSmall from "~/components/LogoSmall.svg";
-import Image from "next/image";
+import _LogoSmall from "~/components/LogoSmall.svg";
+import Image, { type StaticImageData } from "next/image";
 import { ArrowUpIcon, ArrowRightIcon, Loader, GithubIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import * as React from "react";
@@ -13,6 +13,8 @@ import { useToast } from "~/hooks/use-toast";
 import { type ISet } from "~/lib/api/types";
 import ThemeToggle from "./ThemeToggle";
 import Link from "next/link";
+
+const LogoSmall = _LogoSmall as StaticImageData;
 
 export default function Sidebar() {
   const [expanded, setExpanded] = React.useState(false);
@@ -127,7 +129,15 @@ export default function Sidebar() {
             "py-3 px-6 w-full shadow-md justify-center hidden md:flex",
           )}
         >
-          <Image className="h-8 w-8" alt="Twinleaf Logo" {...LogoSmall} />
+          <Link href="/">
+            <Image
+              className="h-8 w-8"
+              alt="Twinleaf Logo"
+              src={LogoSmall.src}
+              width={LogoSmall.width}
+              height={LogoSmall.height}
+            />
+          </Link>
         </div>
 
         {setsQuery.status === "success" ? (
