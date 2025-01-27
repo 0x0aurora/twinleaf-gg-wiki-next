@@ -10,6 +10,7 @@ import { Toaster } from "~/components/ui/toaster";
 import { Suspense } from "react";
 import { Loader } from "lucide-react";
 import { ThemeProvider } from "~/providers/ThemeProvider";
+import ThemeToggle from "~/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Twinleaf Wiki",
@@ -36,6 +37,9 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <Sidebar />
+              <div className="hidden md:inline fixed top-3 right-3">
+                <ThemeToggle />
+              </div>
               <Suspense
                 fallback={
                   <main
